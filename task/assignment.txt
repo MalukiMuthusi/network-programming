@@ -14,18 +14,76 @@ Assignments
 ==========
 
 1. Run both client and server on same machine.
+    DONE
 
 2. Research on client and server model.
     a. motivation behind client server model
+
+    The client server model evolved with the need to utilise resources.
+    Organizations could only afford to buy a few powerful machines.
+    These powerful machines were used to run the critical business process of the organization.
+    The less powerful, cheaper machines were used to access information from the powerful machines.
+    The powerful machines are the servers and the less powerful ones are clients to these servers.
+
+    Applications were developed to run on the servers.
+    There was need to access service from the servers remotely.
+    Protocols were developed to allow servers and clients from different 
+    vendors to communicate remotely regardless of the network connection they were using.
+
+    This model helped the growth of the internet.
+
     b. characteristics of client server model
         i. terminology and concept
+
+        A server can offer many services to other clients.
+        Clients can access services from different servers.
+        For a client to communicate with a server, there must be a way that the client can reach to the server.
+        In computer networks, the client and the server are connected through a network.
+
+        The server has a domain name that clients use to connect to it. 
+        DNS protocol is used to resolve names to IP addresses.
+        The server application is written on top of sockets. The TCP/IP model helps network programmers
+         be able to think about only the upper layer, Transport layer.
+        Sockets provide an interface to develop applications that communicate over a network.
+
+        There are models for creating servers to be able to serve many clients.
+        We have iterative and concurrent servers. Iterative servers do not scale, 
+        while concurrent servers can scale depending on the number of clients requesting services.
+        We can create concurrent servers by forking a new process for each client request or 
+        by spawning a new thread to service the client.
+
+
     c. Differentiate and give examples of 
         i. connection-less and connection oriented servers
+
+        A connection oriented server provide reliable connection to the client.
+        It uses TCP transport protocol. Before the server and the client communicate,
+        they first undergo a three-way handshake
+        Example: FTP
+
+        A connection-less server makes use of UDP transport protocol. 
+        The client and the server communicate directly without the overhead caused by trying to make 
+        any sort of connection.
+        Example: TFTP
+
         ii. stateless and stateful servers
+
+        A stateful server stores information about the sessions it has with the client. 
+        In case of interruptions the server can resume back to the same point it was communicating with the client.
+
+        Stateless server handles each connection as a new. It has no memory of session it had with the client.
+        Example is a browser and http server.
+        
     d. Examples of
         i. standard client software
+            ping
+            web browser
+            SSH client
         ii. standard server software
+            FTP
+            Mail server(SMTP)
         iii. non standard software from assignment 1, explain purpose of software.
+
     e. Design an application as a client server program. A banking application that provides
         the following services:
         i. opening account
