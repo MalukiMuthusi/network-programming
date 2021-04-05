@@ -1,0 +1,78 @@
+Reading
+=======
+
+1. Chapters 1-12
+    Internet networking with TCP/IP vol III
+
+2. Chapter 17
+    TCP/IP Protocol suite
+
+3. Chapters 3-5,8,10,11
+    Unix network programming- The sockets networking API
+
+Assignments
+==========
+
+1. Run both client and server on same machine.
+
+2. Research on client and server model.
+    a. motivation behind client server model
+    b. characteristics of client server model
+        i. terminology and concept
+    c. Differentiate and give examples of 
+        i. connection-less and connection oriented servers
+        ii. stateless and stateful servers
+    d. Examples of
+        i. standard client software
+        ii. standard server software
+        iii. non standard software from assignment 1, explain purpose of software.
+    e. Design an application as a client server program. A banking application that provides
+        the following services:
+        i. opening account
+        ii. closing account
+        iii. withdrawal
+        iv. deposit
+        v. balance and statement
+
+        The design can be basic, iterative server.
+
+3. Research on concurrent processing in  client server model.
+    a. motivation behind concurrent processing.
+    b. How concurrent processing is achieved in networks (Hardware/Operating system level)
+    c. concurrent processing
+        i terminology and concepts
+        ii. concurrent process creation in unix (with possible change in code)
+        iii. concurrent process execution.
+    d. advantages of concurrent processing in client, server model.
+    e. name the important algorithms used in client design.
+        For each algorithm describe
+        i. why it is important
+        ii. when/where it would typically be used
+        iii. any predefined data structures that it may require to use.
+
+4. Rewrite the example program to allow the client to communicate with the server using UDP.
+    a. Rewrite selected application to use UDP.
+    b. highlight the changes you have made.
+    c. document the code to explain
+        i. creating sockets
+        ii. end point addresses (IP + Port)
+        ii client communicating with server, sending data
+        iv. server sending data to client.
+        v. receiving a response, client and server.
+        vi. closing the sockets, client and server
+    d. study the example programs in chapter seven.
+
+5. describe the conceptual server algorithm.
+    a. distinguish between the following
+        i. concurrent vs iterative servers
+        ii. connection oriented vs connection-less
+    b. research on the following servers and when to use them:
+        i. iterative connection-less
+        ii. iterative connection oriented
+        iii. concurrent connection oriented
+        iv. concurrent connection-less oriented
+    c. study the examples in chapters 9-12
+    d. Rewrite the selected application to use the following types of servers.
+        i. concurrent connection oriented
+        ii. concurrent connection-less oriented
+        highlight how you have implemented concurrency
