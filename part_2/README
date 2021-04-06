@@ -1,0 +1,11 @@
+# Online Banking application
+
+The application uses client server model.
+
+## The services the application provides include
+
+[] Opening account
+[] Closing account
+[] Withdraw amount
+[] Deposit amount
+[] Check balance and provide account statement.
