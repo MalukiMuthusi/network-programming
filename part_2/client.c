@@ -99,9 +99,9 @@ int main(int argc, char const *argv[])
     // show prompt of the next steps user can take
     printf("\nHow can we serve you?\n");
     printf("\t1. Balance.\n");
-    printf("\t2. Withdraw.\n");
-    printf("\t3. Open Account\n");
-    printf("\t4. Close Account\n");
+    printf("\t2. Close Account\n");
+    printf("\t3. Withdraw.\n");
+    printf("\t4. Open Account\n");
     printf("\t5. Statements\n");
 
     // read the users service choice
@@ -122,9 +122,6 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-    
-
-    
     switch (action)
     {
     case 1:
@@ -134,7 +131,8 @@ int main(int argc, char const *argv[])
         break;
     case 2:
         // open account
-        open_account(socket_fd);
+        // open_account(socket_fd);
+        close_account(socket_fd);
         break;
     case 3:
         close_account(socket_fd);
@@ -246,35 +244,48 @@ void close_account(size_t socket_fd)
     /* write the close account command to the server. */
 
     char buff[8];
-    if (snprintf(buff, sizeof(buff), "%d", 1) < 0)
+    if (snprintf(buff, sizeof(buff), "%d", 2) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the buffer");
+        printf("failed to write close account command the buffer\n");
         exit(1);
     }
-    if (write(socket_fd, buff, strlen(buff)) < 0)
+    if (send(socket_fd, buff, 8, 0) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the socket");
+        printf("failed to write close account command to the socket\n");
+        exit(1);
+    }
+    printf("confirm you want close account.\n\t 1. Yes\n\t 2. No\n");
+    char confirm[8];
+    scanf("%s", confirm);
+
+    errno = 0;
+    char *endptr;
+    long confirm_number = strtol(confirm, &endptr, 10);
+    if (errno != 0)
+    {
+        perror("Invalid confirmation number Entered\n");
+        exit(EXIT_FAILURE);
+    }
+    if (endptr == confirm)
+    {
+        fprintf(stderr, "No confirmation number was entered\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (send(socket_fd, confirm, 8, 0) < 0)
+    {
+        // TODO: check the errno and return more meaningful error codes
+        printf("failed to write confirm number to the socket\n");
         exit(1);
     }
 
     /* server responds with a message that user can continue */
 
     int n;
-    char receiveline[MAXLINE + 1];
-    while (((n = read(socket_fd, receiveline, MAXLINE)) > 0))
-    {
-        receiveline[n] = 0; // null terminate
-
-        /* write the balance amount to user output */
-        if (fputs(receiveline, stdout) == EOF)
-        {
-            // TODO: return a better error message
-            printf("error when writing the server's response to the output device\n");
-            exit(1);
-        }
-    }
+    char serv_response[8];
+    n = recv(socket_fd, serv_response, 8, 0);
     if (n == -1)
     {
         // TODO: check errno and return a better error message
@@ -282,20 +293,26 @@ void close_account(size_t socket_fd)
         exit(1);
     }
 
-    /* enter comfirmation message that you want to close your online banking service */
-    char comfirm_buff[8];
-    if (snprintf(buff, sizeof(comfirm_buff), "%d", 1) < 0)
+    //proccess server's response
+    errno = 0;
+    char *endptr2;
+    long server_confirm_number = strtol(serv_response, &endptr2, 10);
+    if (errno != 0)
     {
-        // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the buffer");
-        exit(1);
+        perror("Invalid response from server\n");
+        exit(EXIT_FAILURE);
     }
-    if (write(socket_fd, comfirm_buff, strlen(comfirm_buff)) < 0)
+    if (endptr2 == serv_response)
     {
-        // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the socket");
-        exit(1);
+        fprintf(stderr, "server returned wrong response\n");
+        exit(EXIT_FAILURE);
     }
 
-    /* server response with a success or failure in closing online banking service */
+    if (server_confirm_number == 1)
+    {
+        printf("online banking service closed for this account. please visit our physical office to get service\n");
+        return;
+    }
+    else
+        printf("close account aborted!!\n");
 }

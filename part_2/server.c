@@ -14,6 +14,7 @@
 
 /* function declarations */
 void show_balance(size_t connect_fd);
+void close_account(size_t connect_fd);
 
 int main(int argc, char const *argv[])
 {
@@ -96,7 +97,7 @@ int main(int argc, char const *argv[])
         action_command[n] = 0; // null terminate
 
         /* write the command to user output */
-        printf("Received command: \n\t%s\n", action_command);   
+        printf("Received command: \n\t%s\n", action_command);
 
         errno = 0;
         char *endptr;
@@ -119,6 +120,7 @@ int main(int argc, char const *argv[])
             break;
         case 2:
             // open account
+            close_account(connect_fd);
             break;
         case 3:
             // close account
@@ -165,4 +167,42 @@ void show_balance(size_t connect_fd)
         exit(1);
     }
     printf("\nresponded balance amount of: 1000 to the client\n");
+}
+
+void close_account(size_t connect_fd)
+{
+    int n;
+    char confirm_buff[8];
+    n = recv(connect_fd, confirm_buff, 8, 0);
+
+    if (n == -1)
+    {
+        // TODO: check errno and return a better error message
+        printf("error: reading close account confirm message from the socket\n");
+        exit(EXIT_FAILURE);
+    }
+
+    errno = 0;
+    char *endptr;
+    long confirm_number = strtol(confirm_buff, &endptr, 10);
+    if (errno != 0)
+    {
+        perror("Invalid confirmation option received from client\n");
+        exit(EXIT_FAILURE);
+    }
+    if (endptr == confirm_buff)
+    {
+        fprintf(stderr, "no confirmation option was sent by client\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // send response
+    if (send(connect_fd, confirm_buff, 8, 0) < 0)
+    {
+        // TODO: check the errno and return more meaningful error codes
+        printf("failed to write the confirmation message for closing account to the socket\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("server response in close account is: %s\n", confirm_buff);
 }
