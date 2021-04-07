@@ -20,6 +20,16 @@ void close_account(size_t socket_fd);
 /* Online Banking application client */
 int main(int argc, char const *argv[])
 {
+    size_t socket_fd;
+    struct sockaddr_in server_address;
+
+    // Ip address of the server must be provided.
+    if (argc != 2)
+    {
+        printf("Ip address of ther server must be provided\n");
+        exit(1);
+    }
+
     // ask for user pin
     printf("Welcome to Digig bank. Enter PIN to proceed.\n");
 
@@ -59,45 +69,38 @@ int main(int argc, char const *argv[])
     long action = strtol(command, &endptr, 10);
     if (errno != 0)
     {
-        perror("strtol");
+        perror("Invalid Pin Entered\n");
         exit(EXIT_FAILURE);
     }
     if (endptr == pin)
     {
-        fprintf(stderr, "No command was found\n");
+        fprintf(stderr, "No PIN was entered\n");
         exit(EXIT_FAILURE);
     }
 
     /* establish a tcp connection with the server */
 
     //create a socket
-    size_t socket_fd;
+
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("socket error: failed to init a socket");
+        printf("socket error: failed to init a socket.\n\t error code: %s\n", strerror(errno));
         exit(1);
     }
 
     //specify an address for the socket
-    struct sockaddr_in server_address;
+    memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(9002);
-
-    // Ip address of the server must be provided.
-    if (argc != 2)
-    {
-        printf("Ip address of ther server must be provided\n");
-        exit(1);
-    }
+    server_address.sin_port = htons(20000);
 
     // convert the IP address from a string(dot notation), to a binary representation
     if (inet_pton(AF_INET, argv[1], &server_address.sin_addr) <= 0)
     {
         if (errno == EAFNOSUPPORT)
-            printf("invalid address provided\n");
+            printf("invalid address provided\n\t error code: %s\n", strerror(errno));
         else
-            printf("error occurred converting address\n");
+            printf("error occurred converting address\n\t error code: %s\n", strerror(errno));
 
         exit(1);
     }
@@ -147,13 +150,13 @@ void show_balance(size_t socket_fd)
     if (snprintf(buff, sizeof(buff), "%d", 1) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the buffer");
+        printf("failed to write balance command to the buffer.\n");
         exit(1);
     }
     if (write(socket_fd, buff, strlen(buff)) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("failed to write time to the socket");
+        printf("failed to write balance to the socket");
         exit(1);
     }
 
