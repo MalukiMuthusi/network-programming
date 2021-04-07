@@ -69,61 +69,46 @@ int main(int argc, char const *argv[])
 
         // read message from client, user's PIN
         int n;
-        char receiveline[MAXLINE + 1];
-        while (((n = read(connect_fd, receiveline, MAXLINE)) > 0))
-        {
-            receiveline[n] = 0; // null terminate
+        char pin[96];
+        n = recv(connect_fd, pin, 96, 0);
 
-            /* write the PIN to user output */
-            printf("User's pin is: \n\t");
-            if (fputs(receiveline, stdout) == EOF)
-            {
-                // TODO: return a better error message
-                printf("error when writing the server's response to the output device\n");
-                exit(1);
-            }
-        }
         if (n == -1)
         {
             // TODO: check errno and return a better error message
-            printf("error: reading from the socket\n");
+            printf("error: reading PIN from the socket\n");
             exit(1);
         }
+
+        /* write the PIN to user output */
+        printf("User's pin is: \n\t%s\n", pin);
 
         // read the command user selects to get service.
         n = 0;
-        char receiveline_1[MAXLINE + 1];
-        while (((n = read(connect_fd, receiveline_1, MAXLINE)) > 0))
-        {
-            receiveline_1[n] = 0; // null terminate
-
-            /* write the command to user output */
-            printf("Received command: \n\t");
-            if (fputs(receiveline_1, stdout) == EOF)
-            {
-                // TODO: return a better error message
-                printf("error when writing the server's response to the output device\n");
-                exit(1);
-            }
-        }
+        char action_command[8];
+        n = recv(connect_fd, action_command, 8, 0);
         if (n == -1)
         {
             // TODO: check errno and return a better error message
-            printf("error: reading from the socket\n");
+            printf("error: reading action command from the socket\n");
             exit(1);
         }
 
+        action_command[n] = 0; // null terminate
+
+        /* write the command to user output */
+        printf("Received command: \n\t%s\n", action_command);   
+
         errno = 0;
         char *endptr;
-        long command = strtol(receiveline_1, &endptr, 10);
+        long command = strtol(action_command, &endptr, 10);
         if (errno != 0)
         {
-            perror("strtol");
+            perror("failed to convert command to int.\n");
             exit(EXIT_FAILURE);
         }
-        if (endptr == receiveline_1)
+        if (endptr == action_command)
         {
-            fprintf(stderr, "No digits were found\n");
+            fprintf(stderr, "No command was found.\n");
             exit(EXIT_FAILURE);
         }
         switch (command)
@@ -155,7 +140,7 @@ int main(int argc, char const *argv[])
         if (close(connect_fd) < 0)
         {
             // TODO: check the errno and return more meaningful error codes
-            printf("failed to write time to the socket");
+            printf("failed to write time to the socket.\n");
             exit(1);
         }
     }
@@ -166,14 +151,14 @@ int main(int argc, char const *argv[])
 void show_balance(size_t connect_fd)
 {
     // write balance amount to the client
-    char buff[128];
-    if (snprintf(buff, sizeof(buff), "%d", 1000) < 0)
+    char buff[96];
+    if (snprintf(buff, 96, "%s", "1000") < 0)
     {
         // TODO: check the errno and return more meaningful error codes
         printf("failed to write time to the buffer\n");
         exit(1);
     }
-    if (write(connect_fd, buff, strlen(buff)) < 0)
+    if (send(connect_fd, buff, 96, 0) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
         printf("failed to write time to the socket\n");

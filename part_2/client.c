@@ -43,32 +43,6 @@ int main(int argc, char const *argv[])
     long pin_number = strtol(pin, &endptr, 10);
     if (errno != 0)
     {
-        perror("strtol");
-        exit(EXIT_FAILURE);
-    }
-    if (endptr == pin)
-    {
-        fprintf(stderr, "No digits were found\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // show prompt of the next steps user can take
-    printf("\nHow can we serve you?\n");
-    printf("\t1. Balance.\n");
-    printf("\t2. Withdraw.\n");
-    printf("\t3. Open Account\n");
-    printf("\t4. Close Account\n");
-    printf("\t5. Statements\n");
-
-    // read the users service choice
-    char command[8];
-    scanf("%s", command);
-
-    // convert string to integer
-    errno = 0;
-    long action = strtol(command, &endptr, 10);
-    if (errno != 0)
-    {
         perror("Invalid Pin Entered\n");
         exit(EXIT_FAILURE);
     }
@@ -113,10 +87,49 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
+    // send PIN to the server
+
+    if (send(socket_fd, pin, 96, 0) < 0)
+    {
+        // TODO: check the errno and return more meaningful error codes
+        printf("failed to write PIN to the socket\n");
+        exit(1);
+    }
+
+    // show prompt of the next steps user can take
+    printf("\nHow can we serve you?\n");
+    printf("\t1. Balance.\n");
+    printf("\t2. Withdraw.\n");
+    printf("\t3. Open Account\n");
+    printf("\t4. Close Account\n");
+    printf("\t5. Statements\n");
+
+    // read the users service choice
+    char command[8];
+    scanf("%s", command);
+
+    // convert string to integer
+    errno = 0;
+    long action = strtol(command, &endptr, 10);
+    if (errno != 0)
+    {
+        perror("Invalid command Entered\n");
+        exit(EXIT_FAILURE);
+    }
+    if (endptr == pin)
+    {
+        fprintf(stderr, "No command was entered\n");
+        exit(EXIT_FAILURE);
+    }
+
+    
+
+    
     switch (action)
     {
     case 1:
         // show balance
+        printf("show balance called\n");
         show_balance(socket_fd);
         break;
     case 2:
@@ -137,7 +150,7 @@ int main(int argc, char const *argv[])
         break;
     }
 
-    printf("Goodbye. See you later. Thank you for banking with us.");
+    printf("Goodbye. See you later. Thank you for banking with us.\n");
     return 0;
 }
 
@@ -153,34 +166,26 @@ void show_balance(size_t socket_fd)
         printf("failed to write balance command to the buffer.\n");
         exit(1);
     }
-    if (write(socket_fd, buff, strlen(buff)) < 0)
+    if (send(socket_fd, buff, 8, 0) < 0)
     {
         // TODO: check the errno and return more meaningful error codes
-        printf("failed to write balance to the socket");
+        printf("failed to write balance to the socket\n");
         exit(1);
     }
 
     /* read the server's response */
     int n;
-    char receiveline[MAXLINE + 1];
-    while (((n = read(socket_fd, receiveline, MAXLINE)) > 0))
-    {
-        receiveline[n] = 0; // null terminate
+    char receiveline[96];
+    n = recv(socket_fd, receiveline, 96, 0);
 
-        /* write the balance amount to user output */
-        if (fputs(receiveline, stdout) == EOF)
-        {
-            // TODO: return a better error message
-            printf("error when writing the server's response to the output device\n");
-            exit(1);
-        }
-    }
     if (n == -1)
     {
         // TODO: check errno and return a better error message
         printf("error: reading from the socket\n");
         exit(1);
     }
+    /* write the balance amount to user output */
+    printf("Your balance is: %s\n", receiveline);
     return;
 }
 
