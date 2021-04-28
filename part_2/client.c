@@ -105,7 +105,7 @@ int main(int argc, char const *argv[])
     printf("\t3. Withdraw.\n");
     printf("\t4. Statements\n");
 
-    // read the users service choice
+    // read the user's service choice
     char command[8];
     scanf("%s", command);
 
