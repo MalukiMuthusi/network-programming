@@ -1,6 +1,6 @@
-# Online Banking application
+# Online Bank Application implemented in client server model
 
-The application uses client server model.
+The application simulates a user using online banking using USSD.
 
 ## The services the application provides include
 

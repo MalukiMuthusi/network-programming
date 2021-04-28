@@ -1,0 +1,6 @@
+Implement concurrency using
+    1. threads
+    2. select (non blocking IO)
+    3. processes
+
+The design of the client server model.

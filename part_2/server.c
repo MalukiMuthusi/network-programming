@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 {
     /* definitions */
     size_t listen_fd;
-    struct sockaddr_in server_address;
+    struct sockaddr_in server_address; // IPv4 address structure
     size_t connect_fd;
 
     /* create the server socket */
