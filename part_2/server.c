@@ -61,12 +61,13 @@ int main(int argc, char const *argv[])
         // accept a tcp connection request. get the clients details, ip address, port number
         if ((connect_fd = accept(listen_fd, (struct sockaddr *)NULL, NULL)) < 0)
         {
-            // TODO: check the errno and return more meaningful error codes
             printf("failed to accept connection.\n\t error code: %s\n", strerror(errno));
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         else
             printf("successfully connected to client!!\n");
+
+        pid_t child;
 
         /* start: offer service to the client */
 
@@ -118,14 +119,29 @@ int main(int argc, char const *argv[])
         {
         case 1:
             // show balance
-            show_balance(connect_fd);
+            if ((child = fork()) == 0)
+            {
+                close(listen_fd);
+                show_balance(connect_fd);
+                exit(EXIT_SUCCESS);
+            }
             break;
         case 2:
             // open account
-            close_account(connect_fd);
+            if ((child = fork()) == 0)
+            {
+                close(listen_fd);
+                close_account(connect_fd);
+                exit(EXIT_SUCCESS);
+            }
             break;
         case 3:
-            withdraw(connect_fd);
+            if ((child = fork()) == 0)
+            {
+                close(listen_fd);
+                withdraw(connect_fd);
+                exit(EXIT_SUCCESS);
+            }
             // close account
             break;
         case 4:
@@ -171,6 +187,7 @@ void show_balance(size_t connect_fd)
         exit(1);
     }
     printf("\nresponded balance amount of: 1000 to the client\n");
+    exit(EXIT_SUCCESS);
 }
 
 void close_account(size_t connect_fd)
@@ -181,7 +198,6 @@ void close_account(size_t connect_fd)
 
     if (n == -1)
     {
-        // TODO: check errno and return a better error message
         printf("error: reading close account confirm message from the socket\n");
         exit(EXIT_FAILURE);
     }
@@ -203,12 +219,12 @@ void close_account(size_t connect_fd)
     // send response
     if (send(connect_fd, confirm_buff, 8, 0) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write the confirmation message for closing account to the socket\n");
         exit(EXIT_FAILURE);
     }
 
     printf("server response in close account is: %s\n", confirm_buff);
+    exit(EXIT_SUCCESS);
 }
 
 void withdraw(size_t connect_fd)
@@ -248,6 +264,8 @@ void withdraw(size_t connect_fd)
     printf("client wishes to withdraw: %ld\n", withdraw_amount);
 
     // response with withdraw success or failure
+
+    exit(EXIT_SUCCESS);
 }
 
 void open_account(const size_t connect_fd)
