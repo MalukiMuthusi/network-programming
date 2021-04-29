@@ -39,7 +39,6 @@ int main(int argc, char const *argv[])
     char pin[96];
     scanf("%s", pin);
 
-    // TODO: do validation for the PIN
     errno = 0;
     char *endptr;
     long pin_number = strtol(pin, &endptr, 10);
@@ -60,7 +59,6 @@ int main(int argc, char const *argv[])
 
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("socket error: failed to init a socket.\n\t error code: %s\n", strerror(errno));
         exit(1);
     }
@@ -85,7 +83,6 @@ int main(int argc, char const *argv[])
     if ((connect(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0))
     {
         printf("failed to connect socket\n error code: %s\n", strerror(errno));
-        // TODO: check the error codes in errno and return meaningful error message
         exit(1);
     }
 
@@ -93,7 +90,6 @@ int main(int argc, char const *argv[])
 
     if (send(socket_fd, pin, 96, 0) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write PIN to the socket\n");
         exit(1);
     }
@@ -127,7 +123,6 @@ int main(int argc, char const *argv[])
     {
     case 1:
         // show balance
-        printf("show balance called\n");
         show_balance(socket_fd);
         break;
     case 2:
@@ -156,13 +151,11 @@ void show_balance(size_t socket_fd)
     char buff[8];
     if (snprintf(buff, sizeof(buff), "%d", 1) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write balance command to the buffer.\n");
         exit(1);
     }
     if (send(socket_fd, buff, 8, 0) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write balance to the socket\n");
         exit(1);
     }
@@ -174,7 +167,6 @@ void show_balance(size_t socket_fd)
 
     if (n == -1)
     {
-        // TODO: check errno and return a better error message
         printf("error: reading from the socket\n");
         exit(1);
     }
@@ -190,13 +182,11 @@ void open_account(const size_t socket_fd)
     char buff[8];
     if (snprintf(buff, sizeof(buff), "%d", 4) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write open account command to the buffer\n");
         exit(1);
     }
     if (send(socket_fd, buff, 8, 0) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write open account command to the socket\n");
         exit(1);
     }
@@ -286,13 +276,11 @@ void close_account(size_t socket_fd)
     char buff[8];
     if (snprintf(buff, sizeof(buff), "%d", 2) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write close account command the buffer\n");
         exit(1);
     }
     if (send(socket_fd, buff, 8, 0) < 0)
     {
-        // TODO: check the errno and return more meaningful error codes
         printf("failed to write close account command to the socket\n");
         exit(1);
     }
@@ -326,7 +314,6 @@ void close_account(size_t socket_fd)
     char serv_response[8];
     if ((recv(socket_fd, serv_response, 8, 0)) == -1)
     {
-        // TODO: check errno and return a better error message
         printf("error: reading from the socket\n");
         exit(1);
     }
