@@ -121,3 +121,50 @@ ssize_t writen(int fd, const void *buffer, size_t n)
     }
     return n;
 }
+
+long read_pin_from_client(size_t *connect_fd)
+{
+    char *pin;
+    // int n;
+    // if ((n = readn(*connect_fd, pin, MAX_BUFF_SIZE)) == -1)
+    // {
+    //     throw_error_exit("server received invalid data PIN");
+    // }
+    readn(*connect_fd, pin, MAX_BUFF_SIZE);
+
+    // process the pin
+    long pin_number = string_to_number(pin, "server received malformed PIN", "server received invalid PIN");
+    return pin_number;
+}
+
+long string_to_number(char *string, char *error_1, char *error_2)
+{
+    char *endptr;
+    errno = 0;
+    long pin_number = strtol(string, &endptr, 10);
+
+    if (errno != 0)
+    {
+        throw_error_exit(error_1);
+    }
+
+    // no number found
+    if (endptr == string)
+    {
+        throw_error_exit(error_2);
+    }
+}
+
+long select_service(size_t *connect_fd)
+{
+    int n = 0;
+    char *action_command;
+
+    if ((n = readn(*connect_fd, action_command, 96)) < 0)
+    {
+        throw_error_exit("server received invalid command data");
+    }
+
+    long command = string_to_number(action_command, "invalid data for command", "no command was selected");
+    return command;
+}
