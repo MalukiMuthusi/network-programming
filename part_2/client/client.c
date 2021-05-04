@@ -18,22 +18,7 @@ int main(int argc, char const *argv[])
     printf("Welcome to Digig bank. Enter PIN to proceed.\n");
 
     // read pin input
-    char pin[96];
-    scanf("%s", pin);
-
-    errno = 0;
-    char *endptr;
-    long pin_number = strtol(pin, &endptr, 10);
-    if (errno != 0)
-    {
-        perror("Invalid Pin Entered\n");
-        exit(EXIT_FAILURE);
-    }
-    if (endptr == pin)
-    {
-        fprintf(stderr, "No PIN was entered\n");
-        exit(EXIT_FAILURE);
-    }
+    char *pin = read_pin();
 
     /* establish a tcp connection with the server */
 
@@ -57,7 +42,7 @@ int main(int argc, char const *argv[])
     }
 
     // establish a tcp connection to the server.
-    connect_tcp(socket_fd, &server_address);
+    connect_tcp(&socket_fd, &server_address);
 
     // send PIN to the server
     send_pin(pin, socket_fd);
