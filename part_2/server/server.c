@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
         long pin = read_pin_from_client(&connect_fd);
 
         /* write the PIN to user output */
-        printf("User's pin is: \n\t%ld\n", pin);
+        printf("User's PIN is: \n\t%ld\n", pin);
 
         // read the command user selects to get service.
         long action_command = select_service(&connect_fd);
