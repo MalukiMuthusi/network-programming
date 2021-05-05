@@ -43,7 +43,7 @@ void connect_tcp(size_t *socket_fd, struct sockaddr_in *server_address)
     {
         throw_error_exit("failed to connect socket");
     }
-    printf("Successfuly connected to the server!!");
+    printf("Successfuly connected to the server!!\n");
 }
 
 // read pin from std input
@@ -124,13 +124,9 @@ ssize_t writen(int fd, const void *buffer, size_t n)
 
 long read_pin_from_client(size_t *connect_fd)
 {
-    char *pin;
-    // int n;
-    // if ((n = readn(*connect_fd, pin, MAX_BUFF_SIZE)) == -1)
-    // {
-    //     throw_error_exit("server received invalid data PIN");
-    // }
-    readn(*connect_fd, pin, MAX_BUFF_SIZE);
+    char pin[MAX_BUFF_SIZE];
+    readn(*connect_fd, pin, MAX_BUFF_SIZE - 1);
+    printf("raw form of PIN message: %s\n", pin);
 
     // process the pin
     long pin_number = string_to_number(pin, "server received malformed PIN", "server received invalid PIN");
@@ -153,6 +149,8 @@ long string_to_number(char *string, char *error_1, char *error_2)
     {
         throw_error_exit(error_2);
     }
+
+    return pin_number;
 }
 
 long select_service(size_t *connect_fd)
