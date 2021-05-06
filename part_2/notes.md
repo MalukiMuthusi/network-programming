@@ -16,7 +16,7 @@ You can use the standard file functions to read and write data to the socket. Th
 }
 ```
 
-The json data is sent without any formating just a normal string. The server will read the data from the socket. The first read might read up to the `geo-point` then you do subsequent reads to read the complete message. The message is then stored in a buffer. When the client reads an `EOF`, then they know they have read the complete message from the server. 
+The json data is sent without any formating just  normal bytes. The server will read the data from the socket. The first read might read up to the `geo-point` then you do subsequent reads to read the complete message. The message is then stored in a buffer. When the client reads an `EOF`, then they know they have read the complete message from the server. 
 
 The client can now interpret the message. Interpretting the message is just a matter of string processing. Any availble parser can be used.
 

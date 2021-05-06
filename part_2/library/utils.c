@@ -15,7 +15,7 @@ void show_commands()
 // reads the command the user selects
 long read_command_input()
 {
-    char command[8];
+    char *command;
     scanf("%s", command);
 
     // convert string to integer
@@ -148,6 +148,26 @@ long string_to_number(char *string, char *error_1, char *error_2)
     if (endptr == string)
     {
         throw_error_exit(error_2);
+    }
+
+    return pin_number;
+}
+
+long string_to_number_r(char *string, char *error_1, char *error_2)
+{
+    char *endptr;
+    errno = 0;
+    long pin_number = strtol(string, &endptr, 10);
+
+    if (errno != 0)
+    {
+        printf("%s\n", error_1);
+    }
+
+    // no number found
+    if (endptr == string)
+    {
+        printf("%s\n", error_2);
     }
 
     return pin_number;
