@@ -7,7 +7,7 @@ void send_pin(char *pin, socklen_t socket_fd)
     char pin_message[MAX_BUFF_SIZE];
 
     int n;
-    if ((n = snprintf(pin_message, MAX_BUFF_SIZE, "%s", pin)) < 0)
+    if ((n = snprintf(pin_message, MAX_BUFF_SIZE, "{pin: %s}", pin)) < 0)
     {
         throw_error_exit("failed to create a pin message");
     }

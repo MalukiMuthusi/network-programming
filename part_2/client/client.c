@@ -14,12 +14,6 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    // ask for user pin
-    printf("Welcome to Digig bank. Enter PIN to proceed.\n");
-
-    // read pin input
-    char *pin = read_pin();
-
     /* establish a tcp connection with the server */
 
     //create a socket
@@ -44,17 +38,20 @@ int main(int argc, char const *argv[])
     // establish a tcp connection to the server.
     connect_tcp(&socket_fd, &server_address);
 
-    // send PIN to the server
-    send_pin(pin, socket_fd);
+    printf("Welcome to Digig bank.\n");
 
-    // show prompt of the next steps user can take
-    show_commands();
+    int ask_commands = 1;
+    while (ask_commands)
+    {
+        // show prompt of the next steps user can take
+        show_commands();
 
-    // read the user's service choice
-    long action = read_command_input();
+        // read the user's service choice
+        long action = read_command_input();
 
-    // provide the service chosen
-    provide_service(action);
+        // provide the service chosen
+        ask_commands = provide_service(action, socket_fd);
+    }
 
     printf("Goodbye. Thank you for banking with us.\n");
     return 0;

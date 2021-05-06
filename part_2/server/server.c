@@ -28,60 +28,47 @@ int main(int argc, char const *argv[])
         // accept a tcp connection request. get the clients details, ip address, port number
         accept_socket(&connect_fd, &listen_fd);
 
-        pid_t child;
+        // message from client
+        read_message(connect_fd);
+        continue;
 
-        /* start: offer service to the client */
+        // check service to offer from the message
+        void *m;
+        int service = check_service(m);
 
-        // read message from client, user's PIN
-        long pin = read_pin_from_client(&connect_fd);
-
-        /* write the PIN to user output */
-        printf("User's PIN is: \n\t%ld\n", pin);
-
-        // read the command user selects to get service.
-        long action_command = select_service(&connect_fd);
-
-        /* write the command to user output */
-        printf("Received command: \n\t%ld\n", action_command);
-
-        switch (action_command)
+        switch (service)
         {
+        case 0:
+            printf("invalid service\n");
         case 1:
             // show balance
-            if ((child = fork()) == 0)
-            {
-                close(listen_fd);
-                printf("show_balance(connect_fd);");
-                exit(EXIT_SUCCESS);
-            }
+
+            printf("show_balance(connect_fd);");
+
             break;
         case 2:
             // open account
-            if ((child = fork()) == 0)
-            {
-                close(listen_fd);
-                printf("close_account(connect_fd)");
-                exit(EXIT_SUCCESS);
-            }
+
+            printf("close_account(connect_fd)");
+
             break;
         case 3:
-            if ((child = fork()) == 0)
-            {
-                close(listen_fd);
-                printf("withdraw(connect_fd)");
-                exit(EXIT_SUCCESS);
-            }
+
+            printf("withdraw(connect_fd)");
+
             // close account
             break;
         case 4:
+            printf("open_account(socket_fd);");
             // withdraw amount
             break;
         case 5:
             // account statements
-            printf("open_account(connect_fd)");
+            printf("deposit_money");
             break;
 
         default:
+            printf("invalid service\n");
             break;
         }
 
